@@ -3,12 +3,6 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-// #include <fstream>
-// #include <typeinfo>
-// Need to sort files alphabetically and display them in the order
-// For base command if it starts with . then ignore it 
-
-// For now lets put them all in a string vector
 
 namespace fs = std::filesystem;
 
