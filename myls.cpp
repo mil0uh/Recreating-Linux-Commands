@@ -14,7 +14,24 @@ namespace fs = std::filesystem;
 
 std::string flags {"None"};
 std::string filepath = fs::current_path();
-std::vector<std::string> allStrings; 
+std::vector<fs::directory_entry> allEntries; 
+
+std::string filePermissions(fs::perms p){
+    std::string allPerms {};
+    allPerms += ((p & fs::perms::owner_read) != fs::perms::none) ? 'r' : '-';
+    allPerms += ((p & fs::perms::owner_write) != fs::perms::none) ? 'w' : '-';
+    allPerms += ((p & fs::perms::owner_exec) != fs::perms::none) ? 'x' : '-';
+    allPerms += ((p & fs::perms::group_read) != fs::perms::none) ? 'r' : '-';
+    allPerms += ((p & fs::perms::group_write) != fs::perms::none) ? 'w' : '-';
+    allPerms += ((p & fs::perms::group_exec) != fs::perms::none) ? 'x' : '-';
+    allPerms += ((p & fs::perms::others_read) != fs::perms::none) ? 'r' : '-';
+    allPerms += ((p & fs::perms::others_write) != fs::perms::none) ? 'w' : '-';
+    allPerms += ((p & fs::perms::others_exec) != fs::perms::none) ? 'x' : '-';
+    
+
+    return allPerms;
+}
+
 
 int main(int argc, char* argv[]){
 
@@ -24,27 +41,33 @@ int main(int argc, char* argv[]){
 
     for (auto& entry : fs::directory_iterator(filepath)){
         if (entry.is_regular_file()){
-            allStrings.push_back(entry.path().filename());
+            allEntries.push_back(entry);
         }
 
         if (entry.is_directory()){
-            allStrings.push_back(entry.path().filename());
-
+            allEntries.push_back(entry);
         }
-
     }
 
-    std::sort(allStrings.begin(), allStrings.end());
+    std::sort(allEntries.begin(), allEntries.end());
 
-    for (std::string s : allStrings){
-        if ((s.at(0) != '.') && (flags == "None")){
-            std::cout << s << std::endl;
+    for (int i = 0; i < allEntries.size(); i++){
+        std::string currentEntry = allEntries.at(i).path().filename();
+        if ((currentEntry.at(0) != '.' ) && (flags == "None")) {
+            std::cout << currentEntry << " ";
         }
         if (flags == "-a") {
-            std::cout << s << std::endl;
+            std::cout << currentEntry << " ";
         }
+
+        if ((flags == "-l") && currentEntry.at(0) != '.'){
+            std::cout << filePermissions(allEntries.at(i).status().permissions()) << " " << currentEntry << std::endl;
+        }
+
     }
 
-    
+    printf("\n");
+
+
     return 0;
 }
